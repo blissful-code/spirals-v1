@@ -56,7 +56,7 @@
     let isControlsHidden = false;
 
     // Timings
-    let spawnIntervalMin = 200;
+    let spawnIntervalMin = 300;
     let spawnIntervalMax = 1000;
     let ringLifetime = 9000;
     let expansionSpeed = 5.5;
