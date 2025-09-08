@@ -1,0 +1,353 @@
+:root {
+    --bg: #000;
+    --panel-bg: rgba(0, 0, 0, 0.7);
+    --text: #fff;
+    --muted-1: #ccc;
+    --muted-2: #aaa;
+    --muted-3: #777;
+    --border: #333;
+    --accent: #4CAF50;
+    --slider-accent: #0075FF;
+    --button-bg: #333;
+    --button-bg-hover: #555;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+canvas {
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+}
+
+#viewportOverlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9;
+    display: none;
+    --vo: 0.95;
+    background: radial-gradient(circle at var(--vx, 50%) var(--vy, 50%),
+            transparent var(--vr, 150px),
+            rgba(0, 0, 0, var(--vo)) calc(var(--vr, 150px) + 1px));
+}
+
+.controls {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: var(--text);
+    z-index: 10;
+    background-color: var(--panel-bg);
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 200px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.controls.hidden {
+    opacity: 0;
+    transform: translateX(-100%);
+    pointer-events: none;
+}
+
+.controls-header {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+
+.controls-note {
+    margin-bottom: 10px;
+    padding: 5px 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+    border-left: 3px solid var(--slider-accent);
+}
+
+.controls-note small {
+    color: var(--muted-2);
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+button {
+    background-color: var(--button-bg);
+    color: var(--text);
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: var(--button-bg-hover);
+}
+
+.slider-container {
+    margin: 10px 0;
+}
+
+.slider-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.slider {
+    width: 100%;
+    margin: 5px 0;
+}
+
+.slider-value {
+    font-size: 12px;
+    color: var(--muted-1);
+}
+
+.dual-range-container {
+    position: relative;
+    margin: 10px 0;
+}
+
+.dual-range-slider {
+    position: relative;
+    height: 20px;
+}
+
+.dual-range-slider input[type="range"] {
+    position: absolute;
+    width: 100%;
+    height: 20px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    pointer-events: none;
+    margin: 0;
+}
+
+.dual-range-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--slider-accent);
+    cursor: pointer;
+    pointer-events: all;
+    border: 2px solid #fff;
+}
+
+.dual-range-slider input[type="range"]::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--slider-accent);
+    cursor: pointer;
+    pointer-events: all;
+    border: 2px solid #fff;
+}
+
+.dual-range-slider .range-track {
+    position: absolute;
+    height: 4px;
+    background: var(--border);
+    width: 100%;
+    top: 8px;
+    border-radius: 2px;
+}
+
+.dual-range-slider .range-fill {
+    position: absolute;
+    height: 4px;
+    background: var(--slider-accent);
+    top: 8px;
+    border-radius: 2px;
+}
+
+.dual-range-values {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted-1);
+    margin-top: 5px;
+}
+
+.color-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+}
+
+.color-palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.color-box {
+    width: 25px;
+    height: 25px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    position: relative;
+}
+
+.color-box:hover {
+    border-color: var(--text);
+}
+
+.color-input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.add-color-btn {
+    background-color: #444;
+    color: var(--text);
+    border: 1px dashed #666;
+    width: 25px;
+    height: 25px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+.add-color-btn:hover {
+    background-color: var(--button-bg-hover);
+    border-color: #888;
+}
+
+
+.color-controls {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.color-count {
+    font-size: 12px;
+    color: var(--muted-2);
+}
+
+.color-info {
+    font-size: 11px;
+    color: var(--muted-3);
+    margin-top: 5px;
+    line-height: 1.3;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-2px);
+    }
+
+    75% {
+        transform: translateX(2px);
+    }
+}
+
+@media (max-width: 768px) {
+    .controls {
+        position: fixed;
+        top: calc(env(safe-area-inset-top, 0px) + 12px);
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-width: 720px;
+        padding: 12px;
+        border-radius: 12px;
+        min-width: 0;
+    }
+
+    .controls.hidden {
+        transform: translateY(-140%);
+    }
+
+    .controls-header {
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .controls-content {
+        max-height: 70dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    button {
+        padding: 12px 14px;
+        flex: 1 1 auto;
+        min-width: 0;
+        touch-action: manipulation;
+    }
+
+    .dual-range-slider {
+        height: 28px;
+    }
+
+    .dual-range-slider .range-track,
+    .dual-range-slider .range-fill {
+        top: 12px;
+    }
+
+    .dual-range-slider input[type="range"] {
+        height: 28px;
+    }
+
+    .dual-range-slider input[type="range"]::-webkit-slider-thumb {
+        height: 28px;
+        width: 28px;
+    }
+
+    .dual-range-slider input[type="range"]::-moz-range-thumb {
+        height: 28px;
+        width: 28px;
+    }
+
+    .color-box,
+    .add-color-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .color-count,
+    .slider-value,
+    .dual-range-values {
+        font-size: 13px;
+    }
+
+    .controls-note small {
+        font-size: 12px;
+    }
+}

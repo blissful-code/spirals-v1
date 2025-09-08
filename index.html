@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expanding Concentric Rings</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="controls" id="controls">
+        <div class="controls-header">
+            <button id="toggleBtn">Pause</button>
+            <button id="clearBtn">Clear</button>
+            <button id="hideBtn">Hide</button>
+        </div>
+        <div class="controls-note">
+            <small>💡 Click/tap anywhere to bring this menu back</small>
+        </div>
+        
+        <div class="controls-content">
+        <div class="dual-range-container">
+            <label>Ring Spawn Interval Range:</label>
+            <div class="dual-range-slider">
+                <div class="range-track"></div>
+                <div class="range-fill" id="spawnRangeFill"></div>
+                <input type="range" id="spawnMinSlider" min="50" max="5000" value="200">
+                <input type="range" id="spawnMaxSlider" min="50" max="5000" value="1000">
+            </div>
+            <div class="dual-range-values">
+                <span id="spawnMinValue">200ms</span>
+                <span id="spawnMaxValue">1000ms</span>
+            </div>
+        </div>
+        
+        
+        
+        <div class="slider-container">
+            <label for="speedSlider">Expansion Speed:</label>
+            <div class="dual-range-slider">
+                <div class="range-track"></div>
+                <div class="range-fill" id="speedRangeFill"></div>
+                <input type="range" id="speedSlider" class="slider" min="0.5" max="10" step="0.5" value="5.5">
+            </div>
+            <div class="slider-value" id="speedValue">5.5 px/frame</div>
+        </div>
+        
+        <div class="color-section">
+            <label>Color Palette:</label>
+            <div class="color-palette" id="colorPalette"></div>
+            <div class="color-controls">
+                <button id="addColorBtn" class="add-color-btn" title="Add new color">+</button>
+                <button id="removeColorBtn" class="add-color-btn" title="Remove last color">−</button>
+                <span class="color-count" id="colorCount">3 colors</span>
+            </div>
+            <div class="color-controls">
+                <label style="display:flex; align-items:center; gap:6px;">
+                    <input type="checkbox" id="randomizeOrder">
+                    Randomize order
+                </label>
+            </div>
+            <div class="color-info">
+                Click colors to edit • Use + to add new colors • Use − to remove last color
+            </div>
+        </div>
+        
+        <div class="color-section">
+            <label>
+                <input type="checkbox" id="separatorEnabled" checked>
+                Ring Separator
+            </label>
+            <div class="color-controls">
+                <input type="color" id="separatorColor" value="#000000" title="Separator color">
+                <span class="color-info" style="margin: 0;">Plays between main colors</span>
+            </div>
+            
+            <div class="dual-range-container">
+                <label>Separator Spawn Interval Range:</label>
+                <div class="dual-range-slider">
+                    <div class="range-track"></div>
+                    <div class="range-fill" id="separatorRangeFill"></div>
+                    <input type="range" id="separatorMinSlider" min="25" max="2000" value="50">
+                    <input type="range" id="separatorMaxSlider" min="25" max="2000" value="250">
+                </div>
+                <div class="dual-range-values">
+                    <span id="separatorMinValue">50ms</span>
+                    <span id="separatorMaxValue">250ms</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="color-section">
+            <label>Extras:</label>
+            <div class="slider-container">
+                <label style="display:flex; align-items:center; gap:6px;">
+                    <input type="checkbox" id="viewportEnabled">
+                    Circular viewport
+                </label>
+                <div class="dual-range-slider" id="viewportSizeControls" style="display:none;">
+                    <div class="range-track"></div>
+                    <div class="range-fill" id="viewportRangeFill"></div>
+                    <input type="range" id="viewportSizeSlider" class="slider" min="50" max="800" value="250">
+                </div>
+                <div class="slider-value" id="viewportSizeValue" style="display:none;">250 px radius</div>
+
+                <label for="viewportOpacitySlider" id="viewportOpacityLabel" style="display:none; margin-top:8px;">Viewport Opacity:</label>
+                <div class="dual-range-slider" id="viewportOpacityControls" style="display:none;">
+                    <div class="range-track"></div>
+                    <div class="range-fill" id="viewportOpacityRangeFill"></div>
+                    <input type="range" id="viewportOpacitySlider" class="slider" min="0" max="100" step="1" value="95">
+                </div>
+                <div class="slider-value" id="viewportOpacityValue" style="display:none;">95%</div>
+            </div>
+            <div class="slider-container">
+                <label for="ttlSlider">Ring Lifetime:</label>
+                <div class="dual-range-slider">
+                    <div class="range-track"></div>
+                    <div class="range-fill" id="ttlRangeFill"></div>
+                    <input type="range" id="ttlSlider" class="slider" min="2000" max="60000" value="9000">
+                </div>
+                <div class="slider-value" id="ttlValue">9000ms</div>
+            </div>
+        </div>
+        </div>
+    </div>
+    
+    <canvas id="canvas"></canvas>
+    <div id="viewportOverlay" aria-hidden="true"></div>
+
+    <script src="main.js"></script>
+</body>
+</html>
