@@ -10,6 +10,7 @@ Inspired by [Tarolewd](https://tarolewd.github.io/me/).
 
 To try my hosted demo, navigate to https://blissful-code.github.io/spirals-v1/
 
-To run locally, open `index.html` in your browser to get started.
+To run locally, clone the repository and open `index.html` in your browser
+
 
 
