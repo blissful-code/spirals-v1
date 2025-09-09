@@ -8,5 +8,8 @@ Inspired by [Tarolewd](https://tarolewd.github.io/me/).
 
 ## Usage
 
-Open `index.html` in your browser to get started.
+To try my hosted demo, navigate to https://blissful-code.github.io/spirals-v1/
+
+To run locally, open `index.html` in your browser to get started.
+
 
