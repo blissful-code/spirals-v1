@@ -96,32 +96,36 @@
                     <input type="checkbox" id="viewportEnabled">
                     Circular viewport
                 </label>
-                <div class="dual-range-slider" id="viewportSizeControls" style="display:none;">
-                    <div class="range-track"></div>
-                    <div class="range-fill" id="viewportRangeFill"></div>
-                    <input type="range" id="viewportSizeSlider" class="slider" min="50" max="800" value="250">
-                </div>
-                <div class="slider-value" id="viewportSizeValue" style="display:none;">250 px radius</div>
+                <div class="slide-container triple-control collapsed" id="viewportSlideContainer">
+                    <div class="dual-range-slider" id="viewportSizeControls">
+                        <div class="range-track"></div>
+                        <div class="range-fill" id="viewportRangeFill"></div>
+                        <input type="range" id="viewportSizeSlider" class="slider" min="50" max="800" value="250">
+                    </div>
+                    <div class="slider-value" id="viewportSizeValue">250 px radius</div>
 
-                <label for="viewportOpacitySlider" id="viewportOpacityLabel" style="display:none; margin-top:8px;">Viewport Opacity:</label>
-                <div class="dual-range-slider" id="viewportOpacityControls" style="display:none;">
-                    <div class="range-track"></div>
-                    <div class="range-fill" id="viewportOpacityRangeFill"></div>
-                    <input type="range" id="viewportOpacitySlider" class="slider" min="0" max="100" step="1" value="95">
+                    <label for="viewportOpacitySlider" id="viewportOpacityLabel" style="margin-top:8px;">Viewport Opacity:</label>
+                    <div class="dual-range-slider" id="viewportOpacityControls">
+                        <div class="range-track"></div>
+                        <div class="range-fill" id="viewportOpacityRangeFill"></div>
+                        <input type="range" id="viewportOpacitySlider" class="slider" min="0" max="100" step="1" value="95">
+                    </div>
+                    <div class="slider-value" id="viewportOpacityValue">95%</div>
                 </div>
-                <div class="slider-value" id="viewportOpacityValue" style="display:none;">95%</div>
             </div>
             <div class="slider-container">
                 <label style="display:flex; align-items:center; gap:6px;">
                     <input type="checkbox" id="extremeBiasEnabled">
                     Extreme Value Bias
                 </label>
-                <div class="dual-range-slider" id="extremeBiasControls" style="display:none;">
-                    <div class="range-track"></div>
-                    <div class="range-fill" id="extremeBiasRangeFill"></div>
-                    <input type="range" id="extremeBiasSlider" class="slider" min="0" max="100" step="1" value="75">
+                <div class="slide-container dual-slider collapsed" id="extremeBiasSlideContainer">
+                    <div class="dual-range-slider" id="extremeBiasControls">
+                        <div class="range-track"></div>
+                        <div class="range-fill" id="extremeBiasRangeFill"></div>
+                        <input type="range" id="extremeBiasSlider" class="slider" min="0" max="100" step="1" value="75">
+                    </div>
+                    <div class="slider-value" id="extremeBiasValue">75% bias</div>
                 </div>
-                <div class="slider-value" id="extremeBiasValue" style="display:none;">75% bias</div>
                 <div class="color-info" style="margin-top:4px;">
                     A stronger bias makes rings more likely to be extremely large or small
                 </div>
@@ -131,12 +135,14 @@
                     <input type="checkbox" id="colorShiftEnabled">
                     Color Variation
                 </label>
-                <div class="dual-range-slider" id="colorShiftControls" style="display:none;">
-                    <div class="range-track"></div>
-                    <div class="range-fill" id="colorShiftRangeFill"></div>
-                    <input type="range" id="colorShiftSlider" class="slider" min="0" max="50" step="1" value="15">
+                <div class="slide-container dual-slider collapsed" id="colorShiftSlideContainer">
+                    <div class="dual-range-slider" id="colorShiftControls">
+                        <div class="range-track"></div>
+                        <div class="range-fill" id="colorShiftRangeFill"></div>
+                        <input type="range" id="colorShiftSlider" class="slider" min="0" max="50" step="1" value="15">
+                    </div>
+                    <div class="slider-value" id="colorShiftValue">15% variation</div>
                 </div>
-                <div class="slider-value" id="colorShiftValue" style="display:none;">15% variation</div>
                 <div class="color-info" style="margin-top:4px;">
                     Adds subtle color variations to colored rings
                 </div>

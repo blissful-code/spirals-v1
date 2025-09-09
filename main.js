@@ -53,9 +53,27 @@
     const colorShiftValue = document.getElementById('colorShiftValue');
     const colorShiftControls = document.getElementById('colorShiftControls');
     const colorShiftRangeFill = document.getElementById('colorShiftRangeFill');
+    
+    // Slide containers for animations
+    const viewportSlideContainer = document.getElementById('viewportSlideContainer');
+    const extremeBiasSlideContainer = document.getElementById('extremeBiasSlideContainer');
+    const colorShiftSlideContainer = document.getElementById('colorShiftSlideContainer');
     const removeBtnDefaultTitle = removeColorBtn ? removeColorBtn.title : 'Remove last color';
     const removeBtnDefaultText = removeColorBtn ? removeColorBtn.textContent : '−';
     let removeBtnResetTimeoutId = null;
+
+    // Animation helper function
+    function animateSlideContainer(container, show) {
+        if (!container) return;
+        
+        if (show) {
+            container.classList.remove('collapsed');
+            container.classList.add('expanded');
+        } else {
+            container.classList.remove('expanded');
+            container.classList.add('collapsed');
+        }
+    }
 
     // State
     let rings = [];
@@ -137,7 +155,6 @@
         viewportRadius = parseInt(viewportSizeSlider.value);
         if (viewportSizeValue) {
             viewportSizeValue.textContent = viewportSizeSlider.value + ' px radius';
-            viewportSizeValue.style.display = viewportEnabled ? '' : 'none';
         }
         updateSingleRangeFill(viewportSizeSlider, viewportRangeFill);
         updateViewportOverlay();
@@ -145,11 +162,9 @@
 
     function toggleViewport() {
         viewportEnabled = !!(viewportEnabledEl && viewportEnabledEl.checked);
-        if (viewportSizeControls) viewportSizeControls.style.display = viewportEnabled ? '' : 'none';
-        if (viewportSizeValue) viewportSizeValue.style.display = viewportEnabled ? '' : 'none';
-        if (viewportOpacityControls) viewportOpacityControls.style.display = viewportEnabled ? '' : 'none';
-        if (viewportOpacityValue) viewportOpacityValue.style.display = viewportEnabled ? '' : 'none';
-        if (viewportOpacityLabel) viewportOpacityLabel.style.display = viewportEnabled ? '' : 'none';
+        
+        animateSlideContainer(viewportSlideContainer, viewportEnabled);
+        
         if (viewportEnabled) {
             if (viewportSizeSlider) {
                 const maxNow = computeMaxViewportRadius();
@@ -172,7 +187,6 @@
         viewportOpacity = Math.max(0, Math.min(1, percent / 100));
         if (viewportOpacityValue) {
             viewportOpacityValue.textContent = percent + '%';
-            viewportOpacityValue.style.display = viewportEnabled ? '' : 'none';
         }
         updateSingleRangeFill(viewportOpacitySlider, viewportOpacityRangeFill);
         updateViewportOverlay();
@@ -180,8 +194,9 @@
 
     function toggleExtremeBias() {
         extremeBiasEnabled = !!(extremeBiasEnabledEl && extremeBiasEnabledEl.checked);
-        if (extremeBiasControls) extremeBiasControls.style.display = extremeBiasEnabled ? '' : 'none';
-        if (extremeBiasValue) extremeBiasValue.style.display = extremeBiasEnabled ? '' : 'none';
+        
+        animateSlideContainer(extremeBiasSlideContainer, extremeBiasEnabled);
+        
         if (extremeBiasEnabled && extremeBiasSlider) {
             updateSingleRangeFill(extremeBiasSlider, extremeBiasRangeFill);
         }
@@ -193,15 +208,15 @@
         extremeBiasIntensity = percent / 100;
         if (extremeBiasValue) {
             extremeBiasValue.textContent = percent + '% bias';
-            extremeBiasValue.style.display = extremeBiasEnabled ? '' : 'none';
         }
         updateSingleRangeFill(extremeBiasSlider, extremeBiasRangeFill);
     }
 
     function toggleColorShift() {
         colorShiftEnabled = !!(colorShiftEnabledEl && colorShiftEnabledEl.checked);
-        if (colorShiftControls) colorShiftControls.style.display = colorShiftEnabled ? '' : 'none';
-        if (colorShiftValue) colorShiftValue.style.display = colorShiftEnabled ? '' : 'none';
+        
+        animateSlideContainer(colorShiftSlideContainer, colorShiftEnabled);
+        
         if (colorShiftEnabled && colorShiftSlider) {
             updateSingleRangeFill(colorShiftSlider, colorShiftRangeFill);
         }
@@ -213,7 +228,6 @@
         colorShiftIntensity = percent / 100;
         if (colorShiftValue) {
             colorShiftValue.textContent = percent + '% variation';
-            colorShiftValue.style.display = colorShiftEnabled ? '' : 'none';
         }
         updateSingleRangeFill(colorShiftSlider, colorShiftRangeFill);
     }
@@ -229,7 +243,7 @@
         const g = parseInt(hex.substr(2, 2), 16);
         const b = parseInt(hex.substr(4, 2), 16);
 
-        // Calculate shift amount (±intensity * 255)
+        // Calculate shift amount (+/-intensity * 255)
         const maxShift = Math.floor(intensity * 128); // Use 128 instead of 255 for subtler shifts
         
         // Apply random shifts to each channel
