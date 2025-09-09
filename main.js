@@ -59,7 +59,7 @@
     let spawnIntervalMin = 300;
     let spawnIntervalMax = 1000;
     let ringLifetime = 9000;
-    let expansionSpeed = 5.5;
+    let expansionSpeed = 330; // converted from 5.5 px/frame to px/second (5.5 * 60)
 
     // Circular viewport
     let viewportEnabled = false;
@@ -173,12 +173,13 @@
             this.radius = 0;
             this.color = color;
             this.maxRadius = Math.max(canvas.width, canvas.height);
-            this.speed = expansionSpeed;
+            this.speed = expansionSpeed; // now in pixels per second
             this.createdTime = Date.now();
         }
 
-        update() {
-            this.radius += this.speed;
+        update(deltaTime) {
+            // deltaTime is in seconds, speed is in pixels per second
+            this.radius += this.speed * deltaTime;
         }
 
         draw() {
@@ -218,11 +219,14 @@
 
     function animate(currentTime) {
         if (currentTime - lastTime >= 16) {
+            // Calculate deltaTime in seconds
+            const deltaTime = (currentTime - lastTime) / 1000;
+            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (let i = rings.length - 1; i >= 0; i--) {
                 const ring = rings[i];
-                ring.update();
+                ring.update(deltaTime);
                 if (ring.isExpired()) {
                     rings.splice(i, 1);
                 }
@@ -357,7 +361,7 @@
 
     function updateSpeed() {
         expansionSpeed = parseFloat(speedSlider.value);
-        speedValue.textContent = speedSlider.value + ' px/frame';
+        speedValue.textContent = speedSlider.value + ' px/sec';
         rings.forEach(r => r.speed = expansionSpeed);
         updateSingleRangeFill(speedSlider, speedRangeFill);
     }
