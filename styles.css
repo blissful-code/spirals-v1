@@ -91,10 +91,45 @@ button {
     margin: 5px;
     cursor: pointer;
     border-radius: 5px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 button:hover {
     background-color: var(--button-bg-hover);
+    transform: translateY(-1px);
+}
+
+.github-btn {
+    background-color: var(--button-bg);
+    color: var(--text);
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.github-btn:hover {
+    background-color: var(--button-bg-hover);
+    color: var(--text);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.github-btn svg {
+    transition: transform 0.2s ease;
+}
+
+.github-btn:hover svg {
+    transform: scale(1.1);
 }
 
 .slider-container {
@@ -237,6 +272,7 @@ button:hover {
 .add-color-btn:hover {
     background-color: var(--button-bg-hover);
     border-color: #888;
+    transform: translateY(-1px) scale(1.05);
 }
 
 
