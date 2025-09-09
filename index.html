@@ -127,6 +127,21 @@
                 </div>
             </div>
             <div class="slider-container">
+                <label style="display:flex; align-items:center; gap:6px;">
+                    <input type="checkbox" id="colorShiftEnabled">
+                    Color Variation
+                </label>
+                <div class="dual-range-slider" id="colorShiftControls" style="display:none;">
+                    <div class="range-track"></div>
+                    <div class="range-fill" id="colorShiftRangeFill"></div>
+                    <input type="range" id="colorShiftSlider" class="slider" min="0" max="50" step="1" value="15">
+                </div>
+                <div class="slider-value" id="colorShiftValue" style="display:none;">15% variation</div>
+                <div class="color-info" style="margin-top:4px;">
+                    Adds subtle color variations to colored rings
+                </div>
+            </div>
+            <div class="slider-container">
                 <label for="ttlSlider">Ring Lifetime:</label>
                 <div class="dual-range-slider">
                     <div class="range-track"></div>

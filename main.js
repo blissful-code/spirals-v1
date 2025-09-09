@@ -48,6 +48,11 @@
     const extremeBiasValue = document.getElementById('extremeBiasValue');
     const extremeBiasControls = document.getElementById('extremeBiasControls');
     const extremeBiasRangeFill = document.getElementById('extremeBiasRangeFill');
+    const colorShiftEnabledEl = document.getElementById('colorShiftEnabled');
+    const colorShiftSlider = document.getElementById('colorShiftSlider');
+    const colorShiftValue = document.getElementById('colorShiftValue');
+    const colorShiftControls = document.getElementById('colorShiftControls');
+    const colorShiftRangeFill = document.getElementById('colorShiftRangeFill');
     const removeBtnDefaultTitle = removeColorBtn ? removeColorBtn.title : 'Remove last color';
     const removeBtnDefaultText = removeColorBtn ? removeColorBtn.textContent : '−';
     let removeBtnResetTimeoutId = null;
@@ -76,6 +81,10 @@
     // Extreme Value Bias
     let extremeBiasEnabled = false;
     let extremeBiasIntensity = 0.75; // 0 to 1 (0% to 100%)
+
+    // Color Shift
+    let colorShiftEnabled = false;
+    let colorShiftIntensity = 0.15; // 0 to 1 (0% to 100%)
 
     function biasedRandom(intensity = extremeBiasIntensity) {
         if (!extremeBiasEnabled || intensity === 0) {
@@ -189,6 +198,59 @@
         updateSingleRangeFill(extremeBiasSlider, extremeBiasRangeFill);
     }
 
+    function toggleColorShift() {
+        colorShiftEnabled = !!(colorShiftEnabledEl && colorShiftEnabledEl.checked);
+        if (colorShiftControls) colorShiftControls.style.display = colorShiftEnabled ? '' : 'none';
+        if (colorShiftValue) colorShiftValue.style.display = colorShiftEnabled ? '' : 'none';
+        if (colorShiftEnabled && colorShiftSlider) {
+            updateSingleRangeFill(colorShiftSlider, colorShiftRangeFill);
+        }
+    }
+
+    function updateColorShift() {
+        if (!colorShiftSlider) return;
+        const percent = parseInt(colorShiftSlider.value);
+        colorShiftIntensity = percent / 100;
+        if (colorShiftValue) {
+            colorShiftValue.textContent = percent + '% variation';
+            colorShiftValue.style.display = colorShiftEnabled ? '' : 'none';
+        }
+        updateSingleRangeFill(colorShiftSlider, colorShiftRangeFill);
+    }
+
+    function shiftColor(hexColor, intensity = colorShiftIntensity) {
+        if (!colorShiftEnabled || intensity === 0) {
+            return hexColor;
+        }
+
+        // Parse hex color
+        const hex = hexColor.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+
+        // Calculate shift amount (±intensity * 255)
+        const maxShift = Math.floor(intensity * 128); // Use 128 instead of 255 for subtler shifts
+        
+        // Apply random shifts to each channel
+        const rShift = (Math.random() - 0.5) * 2 * maxShift;
+        const gShift = (Math.random() - 0.5) * 2 * maxShift;
+        const bShift = (Math.random() - 0.5) * 2 * maxShift;
+        
+        // Clamp values to 0-255 range
+        const newR = Math.max(0, Math.min(255, Math.round(r + rShift)));
+        const newG = Math.max(0, Math.min(255, Math.round(g + gShift)));
+        const newB = Math.max(0, Math.min(255, Math.round(b + bShift)));
+        
+        // Convert back to hex
+        const newHex = '#' + 
+            newR.toString(16).padStart(2, '0') +
+            newG.toString(16).padStart(2, '0') +
+            newB.toString(16).padStart(2, '0');
+            
+        return newHex;
+    }
+
     // Colors
     let colorIndex = 0;
     const DEFAULT_COLORS = ['#5EBCBB', '#D2C02D', '#7E9AFB'];
@@ -265,7 +327,9 @@
     }
 
     function createRing(x, y, color = null) {
-        const ringColor = color || getNextColor();
+        const baseColor = color || getNextColor();
+        // Only apply color shift to non-separator colors
+        const ringColor = (color === separatorColor) ? baseColor : shiftColor(baseColor);
         rings.push(new Ring(x, y, ringColor));
     }
 
@@ -583,6 +647,12 @@
     if (extremeBiasSlider) {
         extremeBiasSlider.addEventListener('input', updateExtremeBias);
     }
+    if (colorShiftEnabledEl) {
+        colorShiftEnabledEl.addEventListener('change', toggleColorShift);
+    }
+    if (colorShiftSlider) {
+        colorShiftSlider.addEventListener('input', updateColorShift);
+    }
 
     // Init UI from state
     setToggleLabel();
@@ -611,8 +681,12 @@
     if (extremeBiasSlider) {
         updateSingleRangeFill(extremeBiasSlider, extremeBiasRangeFill);
     }
+    if (colorShiftSlider) {
+        updateSingleRangeFill(colorShiftSlider, colorShiftRangeFill);
+    }
     toggleViewport();
     toggleExtremeBias();
+    toggleColorShift();
 
     // Initialize randomize order from UI
     toggleRandomizeOrder();
