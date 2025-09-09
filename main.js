@@ -43,6 +43,11 @@
     const viewportOpacityControls = document.getElementById('viewportOpacityControls');
     const viewportOpacityRangeFill = document.getElementById('viewportOpacityRangeFill');
     const viewportOpacityLabel = document.getElementById('viewportOpacityLabel');
+    const extremeBiasEnabledEl = document.getElementById('extremeBiasEnabled');
+    const extremeBiasSlider = document.getElementById('extremeBiasSlider');
+    const extremeBiasValue = document.getElementById('extremeBiasValue');
+    const extremeBiasControls = document.getElementById('extremeBiasControls');
+    const extremeBiasRangeFill = document.getElementById('extremeBiasRangeFill');
     const removeBtnDefaultTitle = removeColorBtn ? removeColorBtn.title : 'Remove last color';
     const removeBtnDefaultText = removeColorBtn ? removeColorBtn.textContent : '−';
     let removeBtnResetTimeoutId = null;
@@ -59,14 +64,42 @@
     let spawnIntervalMin = 300;
     let spawnIntervalMax = 1000;
     let ringLifetime = 9000;
-    let expansionSpeed = 330; // converted from 5.5 px/frame to px/second (5.5 * 60)
+    let expansionSpeed = 330;
 
     // Circular viewport
     let viewportEnabled = false;
     let viewportRadius = 250;
     let viewportCenterX = 0.5; // percentage of width
     let viewportCenterY = 0.5; // percentage of height
-    let viewportOpacity = 0.95; // 0..1
+    let viewportOpacity = 0.95;
+
+    // Extreme Value Bias
+    let extremeBiasEnabled = false;
+    let extremeBiasIntensity = 0.75; // 0 to 1 (0% to 100%)
+
+    function biasedRandom(intensity = extremeBiasIntensity) {
+        if (!extremeBiasEnabled || intensity === 0) {
+            return Math.random();
+        }
+        
+        // Convert intensity to Beta distribution parameters
+        // Lower values create more extreme bias (U-shaped curve)
+        // intensity 0.5 -> alpha=beta=0.5 (moderate U-shape)
+        // intensity 1.0 -> alpha=beta=0.1 (extreme U-shape)
+        const alpha = Math.max(0.1, 1 - intensity * 0.9);
+        const beta = alpha; // Symmetric distribution for simplicity
+        
+        // Simple Beta distribution approximation using rejection sampling
+        // It's probably not the most efficient way to do this, but it's simple and works well enough
+        let u, v, x;
+        do {
+            u = Math.random();
+            v = Math.random();
+            x = Math.pow(u, 1/alpha) / (Math.pow(u, 1/alpha) + Math.pow(v, 1/beta));
+        } while (isNaN(x));
+        
+        return x;
+    }
 
     function computeMaxViewportRadius() {
         // Ensure the hole can reach the farthest corner from center
@@ -136,6 +169,26 @@
         updateViewportOverlay();
     }
 
+    function toggleExtremeBias() {
+        extremeBiasEnabled = !!(extremeBiasEnabledEl && extremeBiasEnabledEl.checked);
+        if (extremeBiasControls) extremeBiasControls.style.display = extremeBiasEnabled ? '' : 'none';
+        if (extremeBiasValue) extremeBiasValue.style.display = extremeBiasEnabled ? '' : 'none';
+        if (extremeBiasEnabled && extremeBiasSlider) {
+            updateSingleRangeFill(extremeBiasSlider, extremeBiasRangeFill);
+        }
+    }
+
+    function updateExtremeBias() {
+        if (!extremeBiasSlider) return;
+        const percent = parseInt(extremeBiasSlider.value);
+        extremeBiasIntensity = percent / 100;
+        if (extremeBiasValue) {
+            extremeBiasValue.textContent = percent + '% bias';
+            extremeBiasValue.style.display = extremeBiasEnabled ? '' : 'none';
+        }
+        updateSingleRangeFill(extremeBiasSlider, extremeBiasRangeFill);
+    }
+
     // Colors
     let colorIndex = 0;
     const DEFAULT_COLORS = ['#5EBCBB', '#D2C02D', '#7E9AFB'];
@@ -173,12 +226,11 @@
             this.radius = 0;
             this.color = color;
             this.maxRadius = Math.max(canvas.width, canvas.height);
-            this.speed = expansionSpeed; // now in pixels per second
+            this.speed = expansionSpeed;
             this.createdTime = Date.now();
         }
 
         update(deltaTime) {
-            // deltaTime is in seconds, speed is in pixels per second
             this.radius += this.speed * deltaTime;
         }
 
@@ -219,7 +271,6 @@
 
     function animate(currentTime) {
         if (currentTime - lastTime >= 16) {
-            // Calculate deltaTime in seconds
             const deltaTime = (currentTime - lastTime) / 1000;
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -247,7 +298,7 @@
 
     function scheduleNext(fn, minMs, maxMs) {
         clearGenerationTimeout();
-        const delay = Math.random() * (maxMs - minMs) + minMs;
+        const delay = biasedRandom() * (maxMs - minMs) + minMs;
         generationTimeoutId = setTimeout(fn, delay);
     }
 
@@ -291,6 +342,10 @@
             autoGenerateRings();
         } else {
             clearGenerationTimeout();
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
         }
     }
 
@@ -522,6 +577,12 @@
     if (viewportOpacitySlider) {
         viewportOpacitySlider.addEventListener('input', updateViewportOpacity);
     }
+    if (extremeBiasEnabledEl) {
+        extremeBiasEnabledEl.addEventListener('change', toggleExtremeBias);
+    }
+    if (extremeBiasSlider) {
+        extremeBiasSlider.addEventListener('input', updateExtremeBias);
+    }
 
     // Init UI from state
     setToggleLabel();
@@ -547,7 +608,11 @@
     if (viewportOpacitySlider) {
         updateSingleRangeFill(viewportOpacitySlider, viewportOpacityRangeFill);
     }
+    if (extremeBiasSlider) {
+        updateSingleRangeFill(extremeBiasSlider, extremeBiasRangeFill);
+    }
     toggleViewport();
+    toggleExtremeBias();
 
     // Initialize randomize order from UI
     toggleRandomizeOrder();

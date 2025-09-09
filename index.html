@@ -112,6 +112,21 @@
                 <div class="slider-value" id="viewportOpacityValue" style="display:none;">95%</div>
             </div>
             <div class="slider-container">
+                <label style="display:flex; align-items:center; gap:6px;">
+                    <input type="checkbox" id="extremeBiasEnabled">
+                    Extreme Value Bias
+                </label>
+                <div class="dual-range-slider" id="extremeBiasControls" style="display:none;">
+                    <div class="range-track"></div>
+                    <div class="range-fill" id="extremeBiasRangeFill"></div>
+                    <input type="range" id="extremeBiasSlider" class="slider" min="0" max="100" step="1" value="75">
+                </div>
+                <div class="slider-value" id="extremeBiasValue" style="display:none;">75% bias</div>
+                <div class="color-info" style="margin-top:4px;">
+                    A stronger bias makes rings more likely to be extremely large or small
+                </div>
+            </div>
+            <div class="slider-container">
                 <label for="ttlSlider">Ring Lifetime:</label>
                 <div class="dual-range-slider">
                     <div class="range-track"></div>
