@@ -2,8 +2,11 @@
 
 A simple project for creating ringed spiral eyes. Check it out [here](https://blissful-code.github.io/spirals-v1/).
 
+Contributions and PRs welcome. I may be late to see them though so DM me on another platform for a faster turnaround.
+
 Inspired by [Tarolewd](https://tarolewd.github.io/me/).
 
 ## Usage
 
 Open `index.html` in your browser to get started.
+
