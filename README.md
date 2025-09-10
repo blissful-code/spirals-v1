@@ -10,9 +10,9 @@ Open `index.html` in your browser to get started.
 
 ## Settings explanations
 
-Ring Size Range: Determines the minimum and maximum "size" that a ring can be. The units are in milliseconds because this is actually the rate at which new rings spawn which correlates with their size.
+Ring Spacing Range: Determines the minimum and maximum "size" that a ring can be. The units are measured as a percentage of the diagonal screen size.
 
-Expansion Speed - The rate of expansion measured in px/sec
+Expansion Speed - The rate of expansion measured in diagonal screen size. This can be expressed as px/sec but scales on a fucntion of screen size.
 
 Color Palette - The set of colors that are displayed in the rings. Order matters.
 
@@ -20,7 +20,7 @@ Randomize Order - When enabled, the order of the colors in the Color Palette are
 
 Ring Separator - When enabled, a ring of varying size and a defined color is played after each color in the Color Palette.
 
-Separator Ring Size Range - In the same fashion that color rings are randomized, this is as well. Please refer to Ring Size Range above.
+Separator Ring Spacing - In the same fashion that color rings are randomized, this is as well. Please refer to Ring Spacing Range above.
 
 ###  Extras
 
