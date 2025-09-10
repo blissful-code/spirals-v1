@@ -22,7 +22,7 @@ Open `index.html` in your browser to get started.
 
 **Color Palette:** The sequence of colors used for the rings. The order determines the pattern.
 
-**Randomize Order:** When enabled, the color sequence is shuffled each time the palette cycles through.
+**Randomize Order:** When enabled, the colors are shuffled into a random sequence that repeats until the palette is modified or the setting is toggled.
 
 **Ring Separator:** When enabled, a separator ring appears between each color in the palette.
 
