@@ -1,8 +1,14 @@
 # spirals-v1
 
-A simple project for creating ringed spiral eyes. Check it out [here](https://blissful-code.github.io/spirals-v1/).
+A simple web-based visualization tool that creates expanding ringed spirals from the center of the screen. Each ring grows outward with customizable colors, spacing, and effects.
 
-Inspired by [Tarolewd](https://tarolewd.github.io/me/).
+[**Try it live**](https://blissful-code.github.io/spirals-v1/)
+
+![Demo](demo.jpg)
+
+## Contributing
+
+Contributions and Pull Requests are welcome! It might take me some time to see them, so DM me on another platform for faster turnaround on approvals.
 
 ## Usage
 
@@ -10,24 +16,34 @@ Open `index.html` in your browser to get started.
 
 ## Settings explanations
 
-Ring Spacing Range: Determines the minimum and maximum "size" that a ring can be. The units are measured as a percentage of the diagonal screen size.
+**Ring Spacing Range:** Controls the minimum and maximum distance between consecutive rings. Measured as a percentage of the screen's diagonal length.
 
-Expansion Speed - The rate of expansion measured in diagonal screen size. This can be expressed as px/sec but scales on a fucntion of screen size.
+**Expansion Speed:** How fast rings grow outward from the center. Expressed as a percentage of screen diagonal per second (scales with screen size).
 
-Color Palette - The set of colors that are displayed in the rings. Order matters.
+**Color Palette:** The sequence of colors used for the rings. The order determines the pattern.
 
-Randomize Order - When enabled, the order of the colors in the Color Palette are randomized when being displayed.
+**Randomize Order:** When enabled, the color sequence is shuffled each time the palette cycles through.
 
-Ring Separator - When enabled, a ring of varying size and a defined color is played after each color in the Color Palette.
+**Ring Separator:** When enabled, a separator ring appears between each color in the palette.
 
-Separator Ring Spacing - In the same fashion that color rings are randomized, this is as well. Please refer to Ring Spacing Range above.
+**Separator Ring Spacing:** Controls the spacing range for separator rings, using the same percentage-of-diagonal system as main rings.
 
-###  Extras
+### Extras
 
-Circular viewport - When enabled, the spirals are made visible through a hole in a variably-transparent cutout.
+**Circular viewport:** Creates a circular "window" through which the spirals are visible, with an adjustable transparent overlay.
 
-Extreme Value Bias - Uses beta distribution to encourage more extreme values.
+**Extreme Value Bias:** Uses statistical bias to favor more extreme ring sizes (very large or very small) rather than average sizes.
 
-Color Variation - When enabled, colors are shifted slightly in defined range. This ONLY affects colors in the Color Palette, it does NOT affect the ring separator.
+**Color Variation:** Adds subtle random color shifts to palette colors. Does not affect separator rings.
 
-Ring Lifetime - The time in milliseconds that a ring lives before it is deleted.
+**Ring Lifetime:** How long (in milliseconds) each ring remains visible before disappearing.
+
+## Credits
+
+Inspired by [Tarolewd](https://tarolewd.github.io/me/).
+
+Thanks to Lompich and Chris for QA testing!
+
+## License
+
+This project is released under the MIT License. Feel free to use, modify, and distribute as you see fit. Just don't blame me if something breaks! 😄

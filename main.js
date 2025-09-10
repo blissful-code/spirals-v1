@@ -291,7 +291,7 @@
     let separatorEnabled = true;
     let separatorColor = '#000000';
     let separatorSpacingPercentMin = 1;   // % of screen diagonal
-    let separatorSpacingPercentMax = 4;   // % of screen diagonal
+    let separatorSpacingPercentMax = 5;   // % of screen diagonal
     let waitingForSeparator = false;
     let lastSpawnWasSeparator = false;
 
