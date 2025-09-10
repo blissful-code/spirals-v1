@@ -80,14 +80,13 @@
     let animationId;
     let isAnimating = true;
     let lastTime = 0;
-    let generationTimeoutId = null;
     let isControlsHidden = false;
 
     // Timings
-    let spawnIntervalMin = 300;
-    let spawnIntervalMax = 1000;
+    let spacingPercentMin = 5;   // % of screen diagonal
+    let spacingPercentMax = 15;  // % of screen diagonal
     let ringLifetime = 9000;
-    let expansionSpeed = 330;
+    let expansionSpeedPercent = 0.15; // percentage of screen diagonal per second (15%)
 
     // Circular viewport
     let viewportEnabled = false;
@@ -291,9 +290,24 @@
     // Separator
     let separatorEnabled = true;
     let separatorColor = '#000000';
-    let separatorIntervalMin = 50;
-    let separatorIntervalMax = 250;
+    let separatorSpacingPercentMin = 1;   // % of screen diagonal
+    let separatorSpacingPercentMax = 4;   // % of screen diagonal
     let waitingForSeparator = false;
+    let lastSpawnWasSeparator = false;
+
+    // Distance-accumulator spawning state
+    let distanceAccumulatedPx = 0;
+    let currentThresholdPx = 0; // distance to accumulate before spawning next ring
+
+    // Helper function to calculate screen diagonal
+    function getScreenDiagonal() {
+        return Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
+    }
+
+    // Helper function to get current expansion speed in pixels per second
+    function getCurrentExpansionSpeed() {
+        return expansionSpeedPercent * getScreenDiagonal();
+    }
 
     class Ring {
         constructor(x, y, color) {
@@ -302,11 +316,12 @@
             this.radius = 0;
             this.color = color;
             this.maxRadius = Math.max(canvas.width, canvas.height);
-            this.speed = expansionSpeed;
+            this.speed = getCurrentExpansionSpeed();
             this.createdTime = Date.now();
         }
 
         update(deltaTime) {
+            this.speed = getCurrentExpansionSpeed();
             this.radius += this.speed * deltaTime;
         }
 
@@ -366,6 +381,30 @@
                 ring.draw();
             }
 
+            // Accumulate expansion distance and spawn when threshold crossed
+            const currentSpeedPxPerSec = getCurrentExpansionSpeed();
+            distanceAccumulatedPx += currentSpeedPxPerSec * deltaTime;
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            while (distanceAccumulatedPx >= currentThresholdPx && isAnimating) {
+                if (separatorEnabled && waitingForSeparator) {
+                    createRing(centerX, centerY, separatorColor);
+                    lastSpawnWasSeparator = true;
+                    waitingForSeparator = false;
+                } else {
+                    createRing(centerX, centerY);
+                    lastSpawnWasSeparator = false;
+                    if (separatorEnabled) {
+                        waitingForSeparator = true;
+                    }
+                }
+                distanceAccumulatedPx -= currentThresholdPx;
+                // Next threshold is based on what we just spawned, so recompute now
+                recomputeCurrentThresholdPx();
+            }
+
             lastTime = currentTime;
         }
 
@@ -374,38 +413,30 @@
         }
     }
 
-    function scheduleNext(fn, minMs, maxMs) {
-        clearGenerationTimeout();
-        const delay = biasedRandom() * (maxMs - minMs) + minMs;
-        generationTimeoutId = setTimeout(fn, delay);
+    function pickRandomInRange(minVal, maxVal) {
+        return biasedRandom() * (maxVal - minVal) + minVal;
     }
 
-    function clearGenerationTimeout() {
-        if (generationTimeoutId !== null) {
-            clearTimeout(generationTimeoutId);
-            generationTimeoutId = null;
-        }
+    function computePxFromPercentOfDiagonal(percent) {
+        return (percent / 100) * getScreenDiagonal();
     }
 
-    function autoGenerateRings() {
-        if (!isAnimating) return;
+    function nextMainSpacingPx() {
+        const percent = pickRandomInRange(spacingPercentMin, spacingPercentMax);
+        return computePxFromPercentOfDiagonal(percent);
+    }
 
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
+    function nextSeparatorSpacingPx() {
+        const percent = pickRandomInRange(separatorSpacingPercentMin, separatorSpacingPercentMax);
+        return computePxFromPercentOfDiagonal(percent);
+    }
 
-        if (waitingForSeparator && separatorEnabled) {
-            createRing(centerX, centerY, separatorColor);
-            waitingForSeparator = false;
-            scheduleNext(autoGenerateRings, separatorIntervalMin, separatorIntervalMax);
-        } else {
-            createRing(centerX, centerY);
-            if (separatorEnabled) {
-                waitingForSeparator = true;
-                scheduleNext(autoGenerateRings, spawnIntervalMin, spawnIntervalMax);
-            } else {
-                scheduleNext(autoGenerateRings, spawnIntervalMin, spawnIntervalMax);
-            }
+    function recomputeCurrentThresholdPx() {
+        if (!separatorEnabled) {
+            currentThresholdPx = nextMainSpacingPx();
+            return;
         }
+        currentThresholdPx = lastSpawnWasSeparator ? nextSeparatorSpacingPx() : nextMainSpacingPx();
     }
 
     function setToggleLabel() {
@@ -417,9 +448,7 @@
         setToggleLabel();
         if (isAnimating) {
             animate(0);
-            autoGenerateRings();
         } else {
-            clearGenerationTimeout();
             if (animationId) {
                 cancelAnimationFrame(animationId);
                 animationId = null;
@@ -431,31 +460,35 @@
         rings = [];
     }
 
-    function clampDualRange(minSlider, maxSlider, outMin, outMax, displayMin, displayMax, fillEl) {
-        const minVal = parseInt(minSlider.value);
-        const maxVal = parseInt(maxSlider.value);
+    function clampDualRange(minSlider, maxSlider, outMin, outMax, displayMin, displayMax, fillEl, unitSuffix = 'ms', fractionDigits = 0) {
+        const parse = (el) => parseFloat(el.value);
+        let minVal = parse(minSlider);
+        let maxVal = parse(maxSlider);
 
         if (minVal > maxVal) {
-            minSlider.value = maxVal;
+            minSlider.value = String(maxVal);
             outMin.value = maxVal;
+            minVal = maxVal;
         } else {
             outMin.value = minVal;
         }
 
-        if (parseInt(maxSlider.value) < parseInt(minSlider.value)) {
-            maxSlider.value = minSlider.value;
-            outMax.value = parseInt(minSlider.value);
+        if (parse(maxSlider) < parse(minSlider)) {
+            maxSlider.value = String(parse(minSlider));
+            outMax.value = parse(minSlider);
+            maxVal = outMax.value;
         } else {
             outMax.value = maxVal;
         }
 
-        displayMin.textContent = outMin.value + 'ms';
-        displayMax.textContent = outMax.value + 'ms';
+        const formatVal = (v) => Number(v).toFixed(fractionDigits) + unitSuffix;
+        displayMin.textContent = formatVal(outMin.value);
+        displayMax.textContent = formatVal(outMax.value);
 
-        const min = parseInt(minSlider.min);
-        const max = parseInt(minSlider.max);
-        const minPercent = ((parseInt(minSlider.value) - min) / (max - min)) * 100;
-        const maxPercent = ((parseInt(maxSlider.value) - min) / (max - min)) * 100;
+        const min = parseFloat(minSlider.min);
+        const max = parseFloat(minSlider.max);
+        const minPercent = ((parseFloat(minSlider.value) - min) / (max - min)) * 100;
+        const maxPercent = ((parseFloat(maxSlider.value) - min) / (max - min)) * 100;
         fillEl.style.left = minPercent + '%';
         fillEl.style.width = (maxPercent - minPercent) + '%';
     }
@@ -471,19 +504,25 @@
     }
 
     function updateSpawnRange() {
-        const outMin = { value: spawnIntervalMin };
-        const outMax = { value: spawnIntervalMax };
-        clampDualRange(spawnMinSlider, spawnMaxSlider, outMin, outMax, spawnMinValue, spawnMaxValue, spawnRangeFill);
-        spawnIntervalMin = outMin.value;
-        spawnIntervalMax = outMax.value;
+        const outMin = { value: spacingPercentMin };
+        const outMax = { value: spacingPercentMax };
+        clampDualRange(spawnMinSlider, spawnMaxSlider, outMin, outMax, spawnMinValue, spawnMaxValue, spawnRangeFill, '% diag', 1);
+        spacingPercentMin = outMin.value;
+        spacingPercentMax = outMax.value;
+        if (!waitingForSeparator || !separatorEnabled) {
+            recomputeCurrentThresholdPx();
+        }
     }
 
     function updateSeparatorRange() {
-        const outMin = { value: separatorIntervalMin };
-        const outMax = { value: separatorIntervalMax };
-        clampDualRange(separatorMinSlider, separatorMaxSlider, outMin, outMax, separatorMinValueEl, separatorMaxValueEl, separatorRangeFill);
-        separatorIntervalMin = outMin.value;
-        separatorIntervalMax = outMax.value;
+        const outMin = { value: separatorSpacingPercentMin };
+        const outMax = { value: separatorSpacingPercentMax };
+        clampDualRange(separatorMinSlider, separatorMaxSlider, outMin, outMax, separatorMinValueEl, separatorMaxValueEl, separatorRangeFill, '% diag', 2);
+        separatorSpacingPercentMin = outMin.value;
+        separatorSpacingPercentMax = outMax.value;
+        if (separatorEnabled && waitingForSeparator) {
+            recomputeCurrentThresholdPx();
+        }
     }
 
     function updateTTL() {
@@ -493,9 +532,11 @@
     }
 
     function updateSpeed() {
-        expansionSpeed = parseFloat(speedSlider.value);
-        speedValue.textContent = speedSlider.value + ' px/sec';
-        rings.forEach(r => r.speed = expansionSpeed);
+        expansionSpeedPercent = parseFloat(speedSlider.value) / 100;
+        const currentSpeedPx = getCurrentExpansionSpeed();
+        speedValue.textContent = speedSlider.value + '% of screen diagonal/sec (' + Math.round(currentSpeedPx) + ' px/sec)';
+        // Update existing rings with new speed
+        rings.forEach(r => r.speed = getCurrentExpansionSpeed());
         updateSingleRangeFill(speedSlider, speedRangeFill);
     }
 
@@ -582,10 +623,10 @@
 
     function toggleSeparator() {
         separatorEnabled = separatorEnabledEl.checked;
+        // Reset alternation state and ensure next threshold matches upcoming ring
         waitingForSeparator = false;
-        if (isAnimating) {
-            autoGenerateRings();
-        }
+        lastSpawnWasSeparator = false;
+        recomputeCurrentThresholdPx();
     }
 
     function updateSeparatorColor() {
@@ -613,8 +654,10 @@
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        // Keep overlay hole centered and clamp size to viewport
+        updateSpeed();
         updateViewportOverlay();
+        // Diagonal changed so update spacing thresholds
+        recomputeCurrentThresholdPx();
         if (viewportSizeSlider) {
             const newMax = computeMaxViewportRadius();
             viewportSizeSlider.max = String(newMax);
@@ -671,6 +714,7 @@
     // Init UI from state
     setToggleLabel();
     updateTTL();
+    speedSlider.value = Math.round(expansionSpeedPercent * 100);
     updateSpeed();
     updateSpawnRange();
     updateSeparatorRange();
@@ -678,7 +722,7 @@
     // Initialize slider fills
     updateSingleRangeFill(ttlSlider, ttlRangeFill);
     updateSingleRangeFill(speedSlider, speedRangeFill);
-    // Ensure size slider max matches diagonal before computing its fill
+
     if (viewportSizeSlider) {
         const initMax = computeMaxViewportRadius();
         viewportSizeSlider.max = String(initMax);
@@ -705,7 +749,15 @@
     // Initialize randomize order from UI
     toggleRandomizeOrder();
 
+    // Initialize spawning: create first main ring and set threshold
+    const initCenterX = canvas.width / 2;
+    const initCenterY = canvas.height / 2;
+    createRing(initCenterX, initCenterY);
+    lastSpawnWasSeparator = false;
+    waitingForSeparator = separatorEnabled; // next could be separator if enabled
+    distanceAccumulatedPx = 0;
+    recomputeCurrentThresholdPx();
+
     // Start
     animate(0);
-    autoGenerateRings();
 })();
