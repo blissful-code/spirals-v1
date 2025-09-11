@@ -4,7 +4,7 @@ A simple web-based visualization tool that creates expanding ringed spirals from
 
 [**Try it live**](https://blissful-code.github.io/spirals-v1/)
 
-![Demo](demo.jpg)
+![Demo](https://raw.githubusercontent.com/blissful-code/blissful-assets/main/spiralsv1_demo1.gif)
 
 ## Contributing
 
@@ -37,6 +37,14 @@ Open `index.html` in your browser to get started.
 **Color Variation:** Adds subtle random color shifts to palette colors. Does not affect separator rings.
 
 **Ring Lifetime:** How long (in milliseconds) each ring remains visible before disappearing.
+
+## Analytics
+
+This project uses [GoatCounter](https://www.goatcounter.com/) for privacy-friendly web analytics. The analytics script is designed to only load when the site is accessed from a production domain (not localhost, local IPs, or file:// URLs).
+
+**For local development:** The analytics won't trigger when you run this locally, so you can develop and test without affecting the analytics data.
+
+**For forkers/cloners:** If you're hosting your own version, you can safely delete the GoatCounter script tag from `index.html`, or replace it with your own analytics solution.
 
 ## Credits
 
