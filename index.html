@@ -169,5 +169,21 @@
     <div id="viewportOverlay" aria-hidden="true"></div>
 
     <script src="main.js"></script>
+    <script>
+        // Only load GoatCounter analytics in production (not localhost, file://, or local IPs)
+        // Local runners, this is for you. Run this on your own machine and it will not send analytics. 
+        // If you'd like, you can safely delete this script tag (not the other one)
+        if (window.location.hostname !== "localhost" && 
+            window.location.hostname !== "127.0.0.1" &&
+            !window.location.hostname.startsWith("192.168.") &&
+            !window.location.hostname.startsWith("10.") &&
+            window.location.protocol !== "file:") {
+          var s = document.createElement("script");
+          s.src = "//gc.zgo.at/count.js";
+          s.dataset.goatcounter = "https://blissful-code.goatcounter.com/count";
+          s.async = true;
+          document.body.appendChild(s);
+        }
+    </script>
 </body>
 </html>
