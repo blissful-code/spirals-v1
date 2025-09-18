@@ -53,11 +53,23 @@
     const colorShiftValue = document.getElementById('colorShiftValue');
     const colorShiftControls = document.getElementById('colorShiftControls');
     const colorShiftRangeFill = document.getElementById('colorShiftRangeFill');
+    const subliminalsEnabledEl = document.getElementById('subliminalsEnabled');
+    const subliminalsTextEl = document.getElementById('subliminalsText');
+    const subliminalDurationSlider = document.getElementById('subliminalDurationSlider');
+    const subliminalDurationValue = document.getElementById('subliminalDurationValue');
+    const subliminalDurationRangeFill = document.getElementById('subliminalDurationRangeFill');
+    const subliminalFontSlider = document.getElementById('subliminalFontSlider');
+    const subliminalFontValue = document.getElementById('subliminalFontValue');
+    const subliminalFontRangeFill = document.getElementById('subliminalFontRangeFill');
+    const subliminalIntervalSlider = document.getElementById('subliminalIntervalSlider');
+    const subliminalIntervalValue = document.getElementById('subliminalIntervalValue');
+    const subliminalIntervalRangeFill = document.getElementById('subliminalIntervalRangeFill');
     
     // Slide containers for animations
     const viewportSlideContainer = document.getElementById('viewportSlideContainer');
     const extremeBiasSlideContainer = document.getElementById('extremeBiasSlideContainer');
     const colorShiftSlideContainer = document.getElementById('colorShiftSlideContainer');
+    const subliminalsSlideContainer = document.getElementById('subliminalsSlideContainer');
     const removeBtnDefaultTitle = removeColorBtn ? removeColorBtn.title : 'Remove last color';
     const removeBtnDefaultText = removeColorBtn ? removeColorBtn.textContent : '−';
     let removeBtnResetTimeoutId = null;
@@ -102,6 +114,18 @@
     // Color Shift
     let colorShiftEnabled = false;
     let colorShiftIntensity = 0.15; // 0 to 1 (0% to 100%)
+
+    // Subliminals
+    let subliminalsEnabled = false;
+    let subliminalsPhrases = ['abc', 'def', 'ghi', 'jkl'];
+    let activeSubliminals = [];
+    let nextSubliminalAtMs = null;
+    let subliminalMinIntervalMs = 1500;
+    let subliminalMaxIntervalMs = 5000;
+    let subliminalAvgIntervalMs = 3000; // controlled by slider
+    let subliminalDurationMs = 1200; // controlled by slider
+    const subliminalFadeInFraction = 0.2;  // 20% of duration
+    const subliminalFadeOutFraction = 0.2; // 20% of duration
 
     function biasedRandom(intensity = extremeBiasIntensity) {
         if (!extremeBiasEnabled || intensity === 0) {
@@ -264,6 +288,85 @@
         return newHex;
     }
 
+    function parseSubliminalsInput(value) {
+        if (!value) return [];
+        return value
+            .split(',')
+            .map(s => s.trim())
+            .filter(s => s.length > 0);
+    }
+
+    function toggleSubliminals() {
+        subliminalsEnabled = !!(subliminalsEnabledEl && subliminalsEnabledEl.checked);
+        animateSlideContainer(subliminalsSlideContainer, subliminalsEnabled);
+        if (subliminalsEnabled) {
+            if (nextSubliminalAtMs === null) {
+                scheduleNextSubliminal(performance.now());
+            }
+        } else {
+            nextSubliminalAtMs = null;
+            activeSubliminals = [];
+        }
+    }
+
+    function updateSubliminalsText() {
+        if (!subliminalsTextEl) return;
+        subliminalsPhrases = parseSubliminalsInput(subliminalsTextEl.value);
+    }
+
+    function scheduleNextSubliminal(nowMs) {
+        // Sample around avg: +/- 40% variability, clamped to min/max safety bounds
+        const jitter = (Math.random() * 0.8 - 0.4) * subliminalAvgIntervalMs;
+        const interval = Math.max(subliminalMinIntervalMs, Math.min(subliminalMaxIntervalMs, subliminalAvgIntervalMs + jitter));
+        nextSubliminalAtMs = nowMs + interval;
+    }
+
+    function spawnSubliminal(nowMs) {
+        if (subliminalsPhrases.length === 0) return;
+        const text = subliminalsPhrases[Math.floor(Math.random() * subliminalsPhrases.length)];
+        const marginX = canvas.width * 0.10;
+        const marginY = canvas.height * 0.10;
+        const x = marginX + Math.random() * (canvas.width - 2 * marginX);
+        const y = marginY + Math.random() * (canvas.height - 2 * marginY);
+        const durationMs = subliminalDurationMs;
+        
+        // Pick a random color from the palette WITHOUT advancing the ring color index
+        const palette = colorPalette.length ? colorPalette : DEFAULT_COLORS;
+        const fillColor = palette[Math.floor(Math.random() * palette.length)];
+        
+        activeSubliminals.push({ text, x, y, startMs: nowMs, durationMs, fillColor });
+    }
+
+    function updateSubliminalDuration() {
+        if (!subliminalDurationSlider) return;
+        subliminalDurationMs = parseInt(subliminalDurationSlider.value);
+        if (subliminalDurationValue) {
+            subliminalDurationValue.textContent = subliminalDurationSlider.value + 'ms';
+        }
+        updateSingleRangeFill(subliminalDurationSlider, subliminalDurationRangeFill);
+    }
+
+    function updateSubliminalFont() {
+        if (!subliminalFontSlider) return;
+        const v = parseInt(subliminalFontSlider.value);
+        // 0 means Auto (responsive); otherwise fixed px
+        if (v === 0) {
+            if (subliminalFontValue) subliminalFontValue.textContent = 'Auto';
+        } else {
+            if (subliminalFontValue) subliminalFontValue.textContent = v + 'px';
+        }
+        updateSingleRangeFill(subliminalFontSlider, subliminalFontRangeFill);
+    }
+
+    function updateSubliminalInterval() {
+        if (!subliminalIntervalSlider) return;
+        subliminalAvgIntervalMs = parseInt(subliminalIntervalSlider.value);
+        if (subliminalIntervalValue) {
+            subliminalIntervalValue.textContent = subliminalAvgIntervalMs + 'ms';
+        }
+        updateSingleRangeFill(subliminalIntervalSlider, subliminalIntervalRangeFill);
+    }
+
     // Colors
     let colorIndex = 0;
     const DEFAULT_COLORS = ['#5EBCBB', '#D2C02D', '#7E9AFB'];
@@ -379,6 +482,69 @@
             const sortedRings = [...rings].sort((a, b) => b.radius - a.radius);
             for (const ring of sortedRings) {
                 ring.draw();
+            }
+
+            // Subliminals timing and drawing
+            const nowMs = performance.now();
+            if (subliminalsEnabled) {
+                if (nextSubliminalAtMs === null) {
+                    scheduleNextSubliminal(nowMs);
+                } else if (nowMs >= nextSubliminalAtMs) {
+                    spawnSubliminal(nowMs);
+                    scheduleNextSubliminal(nowMs);
+                }
+
+                // Draw and prune active subliminals
+                ctx.save();
+                // Font size: fixed if slider set, else responsive large size
+                const isMobile = window.innerWidth <= 768;
+                const baseFontSize = isMobile ? 42 : 36;
+                const scaleFactor = Math.min(window.innerWidth, window.innerHeight) / 700;
+                const autoFontSize = Math.max(28, baseFontSize * scaleFactor);
+                const fontSize = (subliminalFontSlider && parseInt(subliminalFontSlider.value) > 0)
+                    ? parseInt(subliminalFontSlider.value)
+                    : autoFontSize;
+                
+                ctx.font = `bold ${fontSize}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                for (let i = activeSubliminals.length - 1; i >= 0; i--) {
+                    const s = activeSubliminals[i];
+                    if (nowMs - s.startMs >= s.durationMs) {
+                        activeSubliminals.splice(i, 1);
+                        continue;
+                    }
+                    
+                    // Alpha for fade in/out based on duration
+                    const elapsed = nowMs - s.startMs;
+                    const t = Math.min(1, Math.max(0, elapsed / s.durationMs));
+                    const fadeInEnd = subliminalFadeInFraction;
+                    const fadeOutStart = 1 - subliminalFadeOutFraction;
+                    let alpha = 1;
+                    if (t < fadeInEnd) {
+                        alpha = t / fadeInEnd;
+                    } else if (t > fadeOutStart) {
+                        alpha = Math.max(0, (1 - t) / subliminalFadeOutFraction);
+                    }
+
+                    // Draw glowing border using separator color
+                    const glowSize = Math.max(2, fontSize / 10);
+                    ctx.globalAlpha = alpha;
+                    ctx.strokeStyle = separatorColor;
+                    ctx.lineWidth = glowSize;
+                    ctx.shadowColor = separatorColor;
+                    ctx.shadowBlur = glowSize * 2.5;
+                    ctx.strokeText(s.text, s.x, s.y);
+                    
+                    // Draw main text with palette color
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = s.fillColor;
+                    ctx.fillText(s.text, s.x, s.y);
+                }
+                ctx.restore();
+            } else {
+                activeSubliminals = [];
             }
 
             // Accumulate expansion distance and spawn when threshold crossed
@@ -710,6 +876,21 @@
     if (colorShiftSlider) {
         colorShiftSlider.addEventListener('input', updateColorShift);
     }
+    if (subliminalsEnabledEl) {
+        subliminalsEnabledEl.addEventListener('change', toggleSubliminals);
+    }
+    if (subliminalsTextEl) {
+        subliminalsTextEl.addEventListener('input', updateSubliminalsText);
+    }
+    if (subliminalDurationSlider) {
+        subliminalDurationSlider.addEventListener('input', updateSubliminalDuration);
+    }
+    if (subliminalFontSlider) {
+        subliminalFontSlider.addEventListener('input', updateSubliminalFont);
+    }
+    if (subliminalIntervalSlider) {
+        subliminalIntervalSlider.addEventListener('input', updateSubliminalInterval);
+    }
 
     // Init UI from state
     setToggleLabel();
@@ -742,9 +923,22 @@
     if (colorShiftSlider) {
         updateSingleRangeFill(colorShiftSlider, colorShiftRangeFill);
     }
+    if (subliminalDurationSlider) {
+        updateSingleRangeFill(subliminalDurationSlider, subliminalDurationRangeFill);
+        updateSubliminalDuration();
+    }
+    if (subliminalFontSlider) {
+        updateSingleRangeFill(subliminalFontSlider, subliminalFontRangeFill);
+        updateSubliminalFont();
+    }
+    if (subliminalIntervalSlider) {
+        updateSingleRangeFill(subliminalIntervalSlider, subliminalIntervalRangeFill);
+        updateSubliminalInterval();
+    }
     toggleViewport();
     toggleExtremeBias();
     toggleColorShift();
+    toggleSubliminals();
 
     // Initialize randomize order from UI
     toggleRandomizeOrder();

@@ -153,6 +153,40 @@
                 </div>
             </div>
             <div class="slider-container">
+                <label style="display:flex; align-items:center; gap:6px;">
+                    <input type="checkbox" id="subliminalsEnabled">
+                    Subliminals
+                </label>
+                <div class="slide-container quad-control collapsed" id="subliminalsSlideContainer">
+                    <input type="text" id="subliminalsText" class="text-input" value="Ssssleep, Sssleep, Relax, Stare" title="Comma-separated words or phrases">
+                    <div class="color-info" style="margin-top:4px;">Comma-separated words or phrases</div>
+
+                    <label for="subliminalDurationSlider" style="margin-top:8px;">Subliminal Duration:</label>
+                    <div class="dual-range-slider" id="subliminalDurationControls">
+                        <div class="range-track"></div>
+                        <div class="range-fill" id="subliminalDurationRangeFill"></div>
+                        <input type="range" id="subliminalDurationSlider" class="slider" min="300" max="5000" step="50" value="1200">
+                    </div>
+                    <div class="slider-value" id="subliminalDurationValue">1200ms</div>
+
+                    <label for="subliminalFontSlider" style="margin-top:8px;">Subliminal Font Size:</label>
+                    <div class="dual-range-slider" id="subliminalFontControls">
+                        <div class="range-track"></div>
+                        <div class="range-fill" id="subliminalFontRangeFill"></div>
+                        <input type="range" id="subliminalFontSlider" class="slider" min="16" max="120" step="2" value="0">
+                    </div>
+                    <div class="slider-value" id="subliminalFontValue">Auto</div>
+
+                    <label for="subliminalIntervalSlider" style="margin-top:8px;">Subliminal Average Interval:</label>
+                    <div class="dual-range-slider" id="subliminalIntervalControls">
+                        <div class="range-track"></div>
+                        <div class="range-fill" id="subliminalIntervalRangeFill"></div>
+                        <input type="range" id="subliminalIntervalSlider" class="slider" min="500" max="8000" step="100" value="3000">
+                    </div>
+                    <div class="slider-value" id="subliminalIntervalValue">3000ms</div>
+                </div>
+            </div>
+            <div class="slider-container">
                 <label for="ttlSlider">Ring Lifetime:</label>
                 <div class="dual-range-slider">
                     <div class="range-track"></div>

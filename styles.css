@@ -152,6 +152,21 @@ button:hover {
     color: var(--muted-1);
 }
 
+.text-input {
+    width: 100%;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.text-input:focus {
+    border-color: var(--slider-accent);
+}
+
 .dual-range-container {
     position: relative;
     margin: 10px 0;
@@ -328,6 +343,11 @@ button:hover {
     max-height: 140px;
 }
 
+/* For Subliminals: input + 2 sliders + labels */
+.slide-container.quad-control {
+    max-height: 420px;
+}
+
 @keyframes shake {
 
     0%,
@@ -431,5 +451,16 @@ button:hover {
 
     .controls-note small {
         font-size: 12px;
+    }
+
+    /* Taller content on mobile for Subliminals panel */
+    .slide-container.quad-control {
+        max-height: 520px;
+    }
+
+    /* Fix text input width on mobile */
+    .text-input {
+        padding: 6px 8px;
+        box-sizing: border-box;
     }
 }
