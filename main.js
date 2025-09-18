@@ -122,10 +122,11 @@
     let nextSubliminalAtMs = null;
     let subliminalMinIntervalMs = 1500;
     let subliminalMaxIntervalMs = 5000;
-    let subliminalAvgIntervalMs = 3000; // controlled by slider
+    let subliminalAvgIntervalMs = 2500; // controlled by slider
     let subliminalDurationMs = 1200; // controlled by slider
     const subliminalFadeInFraction = 0.2;  // 20% of duration
     const subliminalFadeOutFraction = 0.2; // 20% of duration
+    let subliminalIndex = 0; // for sequential playback
 
     function biasedRandom(intensity = extremeBiasIntensity) {
         if (!extremeBiasEnabled || intensity === 0) {
@@ -315,15 +316,18 @@
     }
 
     function scheduleNextSubliminal(nowMs) {
+        nextSubliminalAtMs = nowMs + subliminalAvgIntervalMs;
         // Sample around avg: +/- 40% variability, clamped to min/max safety bounds
-        const jitter = (Math.random() * 0.8 - 0.4) * subliminalAvgIntervalMs;
-        const interval = Math.max(subliminalMinIntervalMs, Math.min(subliminalMaxIntervalMs, subliminalAvgIntervalMs + jitter));
-        nextSubliminalAtMs = nowMs + interval;
+        // const jitter = (Math.random() * 0.8 - 0.4) * subliminalAvgIntervalMs;
+        // const interval = Math.max(subliminalMinIntervalMs, Math.min(subliminalMaxIntervalMs, subliminalAvgIntervalMs + jitter));
+        // nextSubliminalAtMs = nowMs + interval;
     }
 
     function spawnSubliminal(nowMs) {
         if (subliminalsPhrases.length === 0) return;
-        const text = subliminalsPhrases[Math.floor(Math.random() * subliminalsPhrases.length)];
+        const text = subliminalsPhrases[subliminalIndex];
+        subliminalIndex = (subliminalIndex + 1) % subliminalsPhrases.length;
+        // const text = subliminalsPhrases[Math.floor(Math.random() * subliminalsPhrases.length)];
         const marginX = canvas.width * 0.10;
         const marginY = canvas.height * 0.10;
         const x = marginX + Math.random() * (canvas.width - 2 * marginX);
