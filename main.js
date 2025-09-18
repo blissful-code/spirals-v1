@@ -117,7 +117,7 @@
 
     // Subliminals
     let subliminalsEnabled = false;
-    let subliminalsPhrases = ['abc', 'def', 'ghi', 'jkl'];
+    let subliminalsPhrases = ['Ssssleep', 'Sssleep', 'Relax', 'Stare'];
     let activeSubliminals = [];
     let nextSubliminalAtMs = null;
     let subliminalMinIntervalMs = 1500;
